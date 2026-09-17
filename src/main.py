@@ -11,7 +11,7 @@ def main():
     # video -> matrix -> SVD algorithm -> background/foreground
     # --------------------------------------------------------
 
-    path = ("videos/people_walking.mp4") #<-- name of your file or directory
+    path = ("videos/driveway-320x240.avi") #<-- name of your file or directory
 
     arr = load_input(path)
     print("Video transformed into an array")
