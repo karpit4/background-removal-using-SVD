@@ -3,7 +3,7 @@ import os
 import glob
 import numpy as np
 from PIL import Image
-
+import cv2
 
 
 def frames_to_array(folder):
@@ -88,3 +88,44 @@ def load_input(path):
         raise FileNotFoundError(
             f"Path '{path}' not found "
         )
+
+
+
+
+def array_to_video(array, output_path, fps):
+    """
+    Numpy array --> videofile
+
+    Parameters
+    ----------
+    array : np.ndarray
+        (frames, height, width)
+
+    output_path : str
+        "results/"
+
+    fps : float
+        Частота кадров исходного видео.
+    """
+
+    array = np.clip(array, 0, 255).astype(np.uint8)
+
+    nframes, height, width = array.shape
+
+    fourcc = cv2.VideoWriter.fourcc(*"mp4v")
+
+    writer = cv2.VideoWriter(
+        output_path,
+        fourcc,
+        fps,
+        (width, height),
+        isColor=False
+    )
+
+    if not writer.isOpened():
+        raise IOError(f"Failed to create a video: {output_path}")
+
+    for frame in array:
+        writer.write(frame)
+
+    writer.release()

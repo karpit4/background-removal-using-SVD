@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os 
 from algorithms import trunc_svd, rand_svd
-from parser import load_input
+from parser import load_input, array_to_video
 
 
 def main():
@@ -11,7 +11,7 @@ def main():
     # video -> matrix -> SVD algorithm -> background/foreground
     # --------------------------------------------------------
 
-    path = ("videos/MSA") #<-- name of your file or directory
+    path = ("videos/people_walking.mp4") #<-- name of your file or directory
 
     arr = load_input(path)
     print("Video transformed into an array")
@@ -32,9 +32,22 @@ def main():
     # Reconstruct the rank-1 background approximation.
     M_background = U @ np.diag(S) @ Vt
 
-    background_frame = M_background[:, 0].reshape(size_h, size_w)
-    foreground_frame = first_frame - background_frame
+    # Convert background matrix back to video:
+    # pixels x frames -> frames x height x width
+    background = M_background.T.reshape(
+        nframes,
+        size_h,
+        size_w
+    )
+    
+    foreground = np.abs(arr - background)
 
+    array_to_video(background, "results/background.mp4", fps=25)
+    array_to_video(foreground, "results/foreground.mp4",fps=25)
+    
+
+    background_frame = background[0]
+    foreground_frame = foreground[0]
     # Show original frame, background and moving objects.
     fig, axs = plt.subplots(1, 3, figsize=(15, 5))
 
